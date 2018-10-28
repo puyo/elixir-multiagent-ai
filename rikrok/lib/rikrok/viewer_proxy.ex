@@ -25,13 +25,20 @@ defmodule Rikrok.ViewerProxy do
   end
 
   @impl true
-  def handle_cast({:send, game_state}, state) do
-    send_to_socket(state.socket, game_state)
+  def handle_cast({:send, glyph_map}, state) do
+    {:ok, data} = Msgpax.pack(glyph_map)
+    with :ok <- :enm.send(state.socket, [<<2>>|data]) do
+      # we sent it...
+    else
+      {:error, :closed} -> send(self(), :reconnect)
+    end
     {:noreply, state}
   end
 
-  def send_to_socket(socket, glyph_map) do
-    {:ok, data} = Msgpax.pack(glyph_map)
-    :enm.send(socket, [<<2>>|data])
+  @impl true
+  def handle_info(:reconnect, state) do
+    {:ok, socket} = :enm.pair
+    :enm.connect(socket, state.socket_path)
+    {:noreply, %{socket: socket, socket_path: state.socket_path}}
   end
 end
