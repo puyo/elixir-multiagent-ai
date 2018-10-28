@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
       uint8_t type = 0;
       std::memcpy(&type, buf, 1);
       // std::cout << "type is: " << (int)type << "\n";
-      std::cout << "." << std::flush;
+      // std::cout << "." << std::flush;
 
       if (type == 42) break;
 
