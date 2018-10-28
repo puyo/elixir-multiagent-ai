@@ -8,9 +8,9 @@ defmodule Rikrok.MobSupervisor do
     DynamicSupervisor.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-  def start_child(%Rikrok.Person{} = m) do
+  def start_child(%struct{} = m) do
     #IO.puts "MobSupervisor: start_child #{inspect m}"
-    spec = {Rikrok.Person, [m]}
+    spec = {struct, [m]}
     DynamicSupervisor.start_child(__MODULE__, spec)
   end
 

@@ -3,7 +3,7 @@ defmodule Rikrok.World do
 
   use GenServer
 
-  alias Rikrok.{Ground, Wall, Person}
+  alias Rikrok.{Ground, Wall, Person, Hunter}
 
   @world %{
     layout: """
@@ -45,7 +45,7 @@ defmodule Rikrok.World do
       "." => %Ground{},
       "#" => %Wall{},
       "@" => %Ground{mob: %Person{name: "Greg", colour: 0x0080FF}},
-      "*" => %Ground{mob: %Person{name: "Ruby", colour: 0xFF0000}}
+      "*" => %Ground{mob: %Hunter{name: "Ruby", colour: 0xFF0000}}
     }
   }
 
@@ -62,6 +62,7 @@ defmodule Rikrok.World do
   def init(_) do
     Process.send_after(self(), :send_to_viewer, 200)
     Process.send_after(self(), :start_mobs, 500)
+
     {:ok, initial_state()}
   end
 
@@ -85,6 +86,15 @@ defmodule Rikrok.World do
     else
       {:reply, mob, state}
     end
+  end
+
+  def handle_call({:look, mob}, _from, state) do
+    w = 40
+    h = 40
+    x = mob.x - div(w, 2)
+    y = mob.y - div(h, 2)
+    area = Rikrok.Matrix.sub_matrix(state.matrix, x, y, w, h)
+    {:reply, {:ok, area}, state}
   end
 
   def handle_info(:send_to_viewer, state) do
@@ -163,17 +173,9 @@ defmodule Rikrok.World do
   end
 
   def mobs(state) do
-    state
-    |> each(fn m, _, _ -> m.mob end)
+    state.matrix
+    |> Rikrok.Matrix.each(fn m, _, _ -> m.mob end)
     |> Enum.reject(&is_nil/1)
-  end
-
-  def each(%{matrix: matrix, width: width, height: height}, f) do
-    Enum.flat_map(0..(height - 1), fn y ->
-      Enum.map(0..(width - 1), fn x ->
-        f.(matrix[y][x], x, y)
-      end)
-    end)
   end
 
   defp glyph_for(%{mob: %struct{} = mob}), do: struct.glyph(mob)

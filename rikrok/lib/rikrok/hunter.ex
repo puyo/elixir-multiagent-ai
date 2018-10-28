@@ -1,4 +1,4 @@
-defmodule Rikrok.Person do
+defmodule Rikrok.Hunter do
   @moduledoc false
 
   # --------------------------------------------------
@@ -47,7 +47,9 @@ defmodule Rikrok.Person do
   end
 
   def update(state) do
-    #IO.inspect "Updating #{state.name}"
+    {:ok, area} = GenServer.call(Rikrok.World, {:look, state})
+    #IO.inspect area: area
+
     dx = Enum.random(-1..1)
     dy = Enum.random(-1..1)
     GenServer.call(Rikrok.World, {:move_mob, state, dx, dy})
