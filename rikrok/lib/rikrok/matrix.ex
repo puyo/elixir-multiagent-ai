@@ -4,7 +4,7 @@ defmodule Rikrok.Matrix do
     ymin = Enum.max(0..y)
 
     xmax = x + w - 1
-    ymax = x + h - 1
+    ymax = y + h - 1
 
     new_list =
       Enum.map(ymin..ymax, fn j ->
@@ -19,7 +19,7 @@ defmodule Rikrok.Matrix do
     nh = length(new_list)
 
     if nw > 0 && nh > 0 do
-      Tensor.Matrix.new(new_list, nw, nh)
+      Tensor.Matrix.new(new_list, nh, nw)
     else
       nil
     end

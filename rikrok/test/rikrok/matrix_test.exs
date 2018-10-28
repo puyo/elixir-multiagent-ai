@@ -36,9 +36,15 @@ defmodule Rikrok.MatrixTest do
       assert result == expected
     end
 
-    test "clipped", %{matrix: matrix} do
+    test "clipped 1", %{matrix: matrix} do
       result = Rikrok.Matrix.sub_matrix(matrix, 20, 20, 1, 1)
       expected = nil
+      assert result == expected
+    end
+
+    test "clipped 2", %{matrix: matrix} do
+      result = Rikrok.Matrix.sub_matrix(matrix, -2, 1, 4, 4)
+      expected = Tensor.Matrix.new([[11, 12], [21, 22], [31, 32]], 3, 2)
       assert result == expected
     end
   end
