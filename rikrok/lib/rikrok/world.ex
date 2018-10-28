@@ -94,6 +94,15 @@ defmodule Rikrok.World do
     x = mob.x - div(w, 2)
     y = mob.y - div(h, 2)
     area = Rikrok.Matrix.sub_matrix(state.matrix, x, y, w, h)
+
+    zeros = Rikrok.Matrix.flat_map(area, fn x -> x end)
+    |> Enum.filter(fn x -> x == 0 end)
+
+    if Enum.any?(zeros) do
+      IO.inspect zeros: zeros
+      raise "XXXX"
+    end
+
     {:reply, {:ok, area}, state}
   end
 
@@ -104,8 +113,8 @@ defmodule Rikrok.World do
   end
 
   def handle_info(:start_mobs, state) do
-    state
-    |> mobs()
+    state.matrix
+    |> Rikrok.Matrix.mobs()
     |> Enum.each(fn m -> Rikrok.MobSupervisor.start_child(m) end)
 
     {:noreply, state}
@@ -170,12 +179,6 @@ defmodule Rikrok.World do
         Tuple.to_list(glyph_for(terrain))
       end)
     end)
-  end
-
-  def mobs(state) do
-    state.matrix
-    |> Rikrok.Matrix.each(fn t -> t.mob end)
-    |> Enum.reject(&is_nil/1)
   end
 
   defp glyph_for(%{mob: %struct{} = mob}), do: struct.glyph(mob)

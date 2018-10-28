@@ -9,7 +9,6 @@ defmodule Rikrok.MobSupervisor do
   end
 
   def start_child(%struct{} = m) do
-    #IO.puts "MobSupervisor: start_child #{inspect m}"
     spec = {struct, [m]}
     DynamicSupervisor.start_child(__MODULE__, spec)
   end

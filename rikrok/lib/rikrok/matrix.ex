@@ -1,8 +1,5 @@
 defmodule Rikrok.Matrix do
   def sub_matrix(matrix, x, y, w, h) do
-    # ww = Tensor.Matrix.width(matrix)
-    # wh = Tensor.Matrix.height(matrix)
-
     xmin = Enum.max(0..x)
     ymin = Enum.max(0..y)
 
@@ -35,10 +32,6 @@ defmodule Rikrok.Matrix do
     Enum.flat_map(0..(h - 1), fn j ->
       Enum.map(0..(w - 1), fn i ->
         x = matrix[j][i]
-        # if x == 0 do
-        #   IO.inspect i: i, j: j, matrix: matrix
-        #   raise "Should not be 0: i = #{i} j = #{j}, #{inspect matrix}"
-        # end
         f.(x)
       end)
     end)
@@ -46,9 +39,7 @@ defmodule Rikrok.Matrix do
 
   def mobs(matrix) do
     matrix
-    |> Rikrok.Matrix.flat_map(fn t ->
-      t.mob
-    end)
+    |> Rikrok.Matrix.flat_map(fn t -> t.mob end)
     |> Enum.reject(&is_nil/1)
   end
 end

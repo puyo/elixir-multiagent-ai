@@ -48,10 +48,20 @@ defmodule Rikrok.Hunter do
 
   def update(state) do
     {:ok, area} = GenServer.call(Rikrok.World, {:look, state})
-    #IO.inspect area: area
 
-    dx = Enum.random(-1..1)
-    dy = Enum.random(-1..1)
+    target =
+      area
+      |> Rikrok.Matrix.mobs()
+      |> Enum.reject(fn m -> m == state end)
+      |> Enum.sort_by(fn m -> Rikrok.Mob.dist_squared(m, state) end)
+      |> List.first
+
+    dx = normalize(target.x - state.x)
+    dy = normalize(target.y - state.y)
+
     GenServer.call(Rikrok.World, {:move_mob, state, dx, dy})
   end
+
+  defp normalize(0), do: 0
+  defp normalize(v), do: div(v, abs(v))
 end
