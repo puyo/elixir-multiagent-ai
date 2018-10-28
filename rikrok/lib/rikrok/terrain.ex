@@ -11,5 +11,5 @@ defmodule Rikrok.Terrain do
     items: list()
   }
 
-  @callback glyph(t()) :: String.t()
+  @callback glyph(t()) :: {String.t(), integer()}
 end

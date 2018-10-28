@@ -46,7 +46,8 @@ int main(int argc, char *argv[]) {
 
       msgpack::object_handle oh = msgpack::unpack((const char*)buf+1, count-1);
       msgpack::object deserialized = oh.get();
-      std::vector< std::vector<std::string> > glyphs;
+      std::vector< std::vector< std::tuple<std::string, int> > > glyphs;
+      // std::cout << deserialized << std::endl;
       deserialized.convert(glyphs);
       nn_freemsg(buf);
 
@@ -64,17 +65,13 @@ int main(int argc, char *argv[]) {
         auto const& row = glyphs[y];
         for (uint x = 0; x < row.size(); ++x) {
           auto const& g = row[x];
-          uint col;
-          switch (g[0]) {
-          case '@': col = 0x00ff00; break;
-          case '.': col = 0xcccccc; break;
-          case '#': col = 0xaaaaaa; break;
-          }
+
+          uint col = std::get<1>(g);
           Display::set_colour(col);
           uint px = x * tw;
           uint py = y * th;
           if (px < Display::width() + tw && py < Display::height() + th) {
-            Display::draw_glyph(px, py, g[0]);
+            Display::draw_glyph(px, py, std::get<0>(g)[0]);
           }
         }
       }

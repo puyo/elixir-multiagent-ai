@@ -44,8 +44,8 @@ defmodule Rikrok.World do
     key: %{
       "." => %Ground{},
       "#" => %Wall{},
-      "@" => %Ground{mob: %Person{name: "Greg"}},
-      "*" => %Ground{mob: %Person{name: "Ruby"}},
+      "@" => %Ground{mob: %Person{name: "Greg", colour: 0x0080ff}},
+      "*" => %Ground{mob: %Person{name: "Ruby", colour: 0xff0000}},
     }
   }
 
@@ -99,7 +99,7 @@ defmodule Rikrok.World do
     |> Tensor.Matrix.to_list()
     |> Enum.map(fn row ->
       Enum.map(row, fn terrain ->
-        glyph_for(terrain)
+        Tuple.to_list glyph_for(terrain)
       end)
     end)
   end

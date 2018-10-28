@@ -5,5 +5,5 @@ defmodule Rikrok.Mob do
 
   @type t :: %__MODULE__{}
 
-  @callback glyph(t()) :: String.t()
+  @callback glyph(t()) :: {String.t(), integer()}
 end

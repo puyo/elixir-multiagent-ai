@@ -36,5 +36,3 @@ Renders the state. Obtains the state from the simulation via inter-process comms
   doesn't matter too much because I am running one of each in a 2-way pair.
 
 * Make agents smarter.
-
-* Send colours to the viewer so agents can be unique colours.
