@@ -67,12 +67,18 @@ defmodule Rikrok.World do
   end
 
   def handle_call({:move_mob, mob, dx, dy}, _from, state) do
+    # IO.inspect move_mob: 1, mob: mob.tipped
     # IO.inspect "World move mob"
+
+    world_mob =
+      state.matrix[mob.y][mob.x].mob
+
     new_mob =
-      mob
+      world_mob
       |> set_pos(mob.x + dx, mob.y + dy)
 
     if did_move(dx, dy) && in_world(new_mob.x, new_mob.y, state) && can_move_to(new_mob.x, new_mob.y, state) do
+
       new_matrix =
         state.matrix
         |> update_in([new_mob.y, new_mob.x], fn t -> struct(t, mob: new_mob) end)
@@ -82,9 +88,34 @@ defmodule Rikrok.World do
         state
         |> put_in([:matrix], new_matrix)
 
+      # IO.inspect move_mob: 1, new_mob: new_mob.tipped
       {:reply, new_mob, new_state}
     else
       {:reply, mob, state}
+    end
+  end
+
+  def handle_call({:tag, mob, target}, _from, state) do
+    # IO.inspect tag: 1, mob: mob, target: target
+
+    dx = target.x - mob.x
+    dy = target.y - mob.y
+
+    if (dx in -1..1) && (dy in -1..1) do
+      new_target = struct(target, tipped: true)
+
+      new_matrix =
+        state.matrix
+        |> update_in([target.y, target.x], fn t -> struct(t, mob: new_target) end)
+
+      new_state =
+        state
+        |> put_in([:matrix], new_matrix)
+
+      # IO.inspect tag: 1, new_target: new_target.tipped
+      {:reply, 1, new_state}
+    else
+      {:reply, 0, state}
     end
   end
 
@@ -95,11 +126,11 @@ defmodule Rikrok.World do
     y = mob.y - div(h, 2)
     area = Rikrok.Matrix.sub_matrix(state.matrix, x, y, w, h)
 
+    # check for this bug
     zeros = Rikrok.Matrix.flat_map(area, fn x -> x end)
     |> Enum.filter(fn x -> x == 0 end)
-
     if Enum.any?(zeros) do
-      IO.inspect zeros: zeros
+      IO.inspect x: x, y: y, w: w, h: h, zeros: zeros, area: area
       raise "XXXX"
     end
 

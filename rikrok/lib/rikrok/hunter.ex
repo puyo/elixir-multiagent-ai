@@ -6,7 +6,7 @@ defmodule Rikrok.Hunter do
 
   @behaviour Rikrok.Mob
 
-  defstruct name: nil, x: 0, y: 0, inventory: [], colour: 0
+  defstruct name: nil, x: 0, y: 0, inventory: [], colour: 0, tipped: false
 
   @impl true
   def glyph(t) do
@@ -52,14 +52,28 @@ defmodule Rikrok.Hunter do
     target =
       area
       |> Rikrok.Matrix.mobs()
+      |> Enum.reject(fn m -> m.tipped end)
       |> Enum.reject(fn m -> m == state end)
       |> Enum.sort_by(fn m -> Rikrok.Mob.dist_squared(m, state) end)
       |> List.first
 
-    dx = normalize(target.x - state.x)
-    dy = normalize(target.y - state.y)
-
-    GenServer.call(Rikrok.World, {:move_mob, state, dx, dy})
+    if is_nil(target) do
+      dx = Enum.random(-1..1)
+      dy = Enum.random(-1..1)
+      GenServer.call(Rikrok.World, {:move_mob, state, dx, dy})
+    else
+      dx = target.x - state.x
+      dy = target.y - state.y
+      if (dx in -1..1) && (dy in -1..1) do
+        GenServer.call(Rikrok.World, {:tag, state, target})
+        state
+      else
+        ndx = normalize(dx)
+        ndy = normalize(dy)
+        new_state = GenServer.call(Rikrok.World, {:move_mob, state, ndx, ndy})
+        new_state
+      end
+    end
   end
 
   defp normalize(0), do: 0

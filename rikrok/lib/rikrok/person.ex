@@ -6,11 +6,11 @@ defmodule Rikrok.Person do
 
   @behaviour Rikrok.Mob
 
-  defstruct name: nil, x: 0, y: 0, inventory: [], colour: 0
+  defstruct name: nil, x: 0, y: 0, inventory: [], colour: 0, tipped: false
 
   @impl true
   def glyph(t) do
-    {"@", t.colour}
+    {"@", if t.tipped do 0x00ff00 else t.colour end}
   end
 
   # --------------------------------------------------
