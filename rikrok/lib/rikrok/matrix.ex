@@ -26,7 +26,7 @@ defmodule Rikrok.Matrix do
 
     Enum.flat_map(0..(h - 1), fn j ->
       Enum.map(0..(w - 1), fn i ->
-        f.(matrix[j][i], i, j)
+        f.(matrix[j][i])
       end)
     end)
   end

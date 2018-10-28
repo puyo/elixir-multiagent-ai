@@ -174,7 +174,7 @@ defmodule Rikrok.World do
 
   def mobs(state) do
     state.matrix
-    |> Rikrok.Matrix.each(fn m, _, _ -> m.mob end)
+    |> Rikrok.Matrix.each(fn t -> t.mob end)
     |> Enum.reject(&is_nil/1)
   end
 
