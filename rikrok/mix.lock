@@ -1,0 +1,12 @@
+%{
+  "currying": {:hex, :currying, "1.0.3", "6d036c86c38663a795858c9e744e406a62d7e5a66243a7da15326e731cdcd672", [:mix], [], "hexpm"},
+  "enm": {:git, "https://github.com/basho/enm.git", "0c8a047ebda77e35fc9c514585e7a523a3fc8cfa", []},
+  "extractable": {:hex, :extractable, "0.2.0", "8527dd76d37978afeb591a98f433e294ffd634e91a6be5cab410f94d5329adbc", [:mix], [], "hexpm"},
+  "file_system": {:hex, :file_system, "0.2.6", "fd4dc3af89b9ab1dc8ccbcc214a0e60c41f34be251d9307920748a14bf41f1d3", [:mix], [], "hexpm"},
+  "fun_land": {:hex, :fun_land, "0.9.1", "0acad45dfb386c6be40a3385a493f5fbe5c1eee2ab077438df898dd032396db7", [:mix], [{:currying, "~> 1.0", [hex: :currying, repo: "hexpm", optional: false]}, {:numbers, "~> 4.0", [hex: :numbers, repo: "hexpm", optional: false]}], "hexpm"},
+  "insertable": {:hex, :insertable, "0.2.0", "f9ef5e484d1cc0756f1d248a54466aa6388142a81df18f588158e3eda2501395", [:mix], [], "hexpm"},
+  "mix_test_watch": {:hex, :mix_test_watch, "0.9.0", "c72132a6071261893518fa08e121e911c9358713f62794a90c95db59042af375", [:mix], [{:file_system, "~> 0.2.1 or ~> 0.3", [hex: :file_system, repo: "hexpm", optional: false]}], "hexpm"},
+  "msgpax": {:hex, :msgpax, "0.8.2", "0e83d86e7cbf1bdcf7b870c25951df042ec19f9804a1a9c2fa59091a43ee2886", [:mix], [], "hexpm"},
+  "numbers": {:hex, :numbers, "4.0.0", "69873a5dcc9a2e453fd957a365a26cf5949ae94d4e25be1929c926875f194d7c", [:mix], [], "hexpm"},
+  "tensor": {:hex, :tensor, "2.0.1", "6f4d7ac2b2e9b7fd4d9ed38e7bfbd3152a358015c705c18b2b01311cd4f1a2aa", [:mix], [{:extractable, "~> 0.2.0", [hex: :extractable, repo: "hexpm", optional: false]}, {:fun_land, "~> 0.9.0", [hex: :fun_land, repo: "hexpm", optional: false]}, {:insertable, "~> 0.2.0", [hex: :insertable, repo: "hexpm", optional: false]}, {:numbers, "~> 4.0", [hex: :numbers, repo: "hexpm", optional: false]}], "hexpm"},
+}
