@@ -1,18 +1,22 @@
 #include "display.hpp"
 #include "events.hpp"
 
-#include <cstring>
-#include <vector>
 #include <nanomsg/nn.h>
 #include <nanomsg/pair.h>
-#include <msgpack.hpp>
-#include <iostream>
 
+#include <msgpack.hpp>
+
+#include <assert.h>
+#include <libc.h>
+
+#include <cstring>
+#include <vector>
+#include <iostream>
 
 int main(int argc, char *argv[]) {
   // init display
   printf("Opening window...\n");
-  Display::open("Viewer", 1600, 800);
+  Display::open("Viewer", 800, 600);
   int font = Display::load_font("fonts/map.png");
   Display::set_font(font);
   uint tw = Display::text_width(font, "W");
@@ -21,55 +25,60 @@ int main(int argc, char *argv[]) {
   // init network
   printf("Connecting...\n");
   int s = nn_socket(AF_SP, NN_PAIR);
-  nn_bind(s, "ipc:///tmp/test.ipc");
+  assert(s >= 0);
+  assert( nn_bind(s, "ipc:///tmp/test.ipc") >= 0);
   void* buf = NULL;
-  int count;
   struct nn_pollfd pfd;
   pfd.fd = s;
   pfd.events = NN_POLLIN;
 
   while (true) {
-    int rc = nn_poll(&pfd, 1, 0);
-
     //printf("Pollin\n");
-    if (rc > 0 && pfd.revents & NN_POLLIN) {
-      //printf("Message can be received from s1!\n");
+    int count = nn_recv(s, &buf, NN_MSG, NN_DONTWAIT);
 
-      if ((count = nn_recv(s, &buf, NN_MSG, 0)) != -1) {
-        uint8_t type = 0;
-        std::memcpy(&type, buf, 1);
-        // std::cout << "type is: " << (int)type << "\n";
+    if (count > 0) {
+      uint8_t type = 0;
+      std::memcpy(&type, buf, 1);
+      // std::cout << "type is: " << (int)type << "\n";
+      std::cout << "." << std::flush;
 
-        if (type == 42) break;
+      if (type == 42) break;
 
-        msgpack::object_handle oh = msgpack::unpack((const char*)buf+1, count-1);
-        msgpack::object deserialized = oh.get();
-        std::vector< std::vector<std::string> > glyphs;
-        deserialized.convert(glyphs);
-        nn_freemsg(buf);
+      msgpack::object_handle oh = msgpack::unpack((const char*)buf+1, count-1);
+      msgpack::object deserialized = oh.get();
+      std::vector< std::vector<std::string> > glyphs;
+      deserialized.convert(glyphs);
+      nn_freemsg(buf);
 
-        // DRAW
-        Display::set_colour(0xffffff);
-        for (uint y = 0; y < glyphs.size(); ++y) {
-          auto const& row = glyphs[y];
-          for (uint x = 0; x < row.size(); ++x) {
-            auto const& g = row[x];
-            uint col;
-            switch (g[0]) {
-            case '@': col = 0x00ff00; break;
-            case '.': col = 0xcccccc; break;
-            case '#': col = 0xaaaaaa; break;
-            }
-            Display::set_colour(col);
-            uint px = x * tw;
-            uint py = y * th;
-            if (px < Display::width() + tw && py < Display::height() + th) {
-              Display::draw_glyph(px, py, g[0]);
-            }
+      uint h = glyphs.size() * th;
+      uint w = glyphs[0].size() * tw;
+
+      if (w != Display::width() || h != Display::height()) {
+        std::cout << "setting size to " << w << "x" << h << std::flush;
+        Display::set_size(w, h);
+      }
+
+      // DRAW
+      Display::set_colour(0xffffff);
+      for (uint y = 0; y < glyphs.size(); ++y) {
+        auto const& row = glyphs[y];
+        for (uint x = 0; x < row.size(); ++x) {
+          auto const& g = row[x];
+          uint col;
+          switch (g[0]) {
+          case '@': col = 0x00ff00; break;
+          case '.': col = 0xcccccc; break;
+          case '#': col = 0xaaaaaa; break;
+          }
+          Display::set_colour(col);
+          uint px = x * tw;
+          uint py = y * th;
+          if (px < Display::width() + tw && py < Display::height() + th) {
+            Display::draw_glyph(px, py, g[0]);
           }
         }
-        Display::refresh();
       }
+      Display::refresh();
     }
 
     //printf("Get next\n");
