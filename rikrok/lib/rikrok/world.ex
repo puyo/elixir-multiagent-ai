@@ -126,7 +126,6 @@ defmodule Rikrok.World do
   # server
 
   def init(state) do
-    #Process.send_after(self(), :print, 200)
     Process.send_after(self(), :send_to_viewer, 200)
     Process.send_after(self(), :start_mobs, 500)
     {:ok, state}
@@ -171,25 +170,6 @@ defmodule Rikrok.World do
   def handle_info(:send_to_viewer, state) do
     GenServer.cast(Rikrok.ViewerProxy, {:send, matrix_to_glyph_map(state.matrix)})
     Process.send_after(self(), :send_to_viewer, 100)
-    {:noreply, state}
-  end
-
-  def handle_info(:print, state) do
-    stream = :stdio
-
-    state.matrix
-    |> Tensor.Matrix.to_list()
-    |> Enum.each(fn row ->
-      Enum.each(row, fn terrain ->
-        IO.write(stream, glyph_for(terrain))
-      end)
-
-      IO.write(stream, "\n")
-    end)
-
-    IO.write(stream, "\n")
-
-    Process.send_after(self(), :print, 200)
     {:noreply, state}
   end
 
