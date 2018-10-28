@@ -33,17 +33,14 @@ int main(int argc, char *argv[]) {
   pfd.events = NN_POLLIN;
 
   while (true) {
-    //printf("Pollin\n");
     int count = nn_recv(s, &buf, NN_MSG, NN_DONTWAIT);
 
     if (count > 0) {
-      uint8_t type = 0;
-      std::memcpy(&type, buf, 1);
-      // std::cout << "type is: " << (int)type << "\n";
       // std::cout << "." << std::flush;
 
-      if (type == 42) break;
-
+      // unpack message
+      uint8_t type = 0;
+      std::memcpy(&type, buf, 1);
       msgpack::object_handle oh = msgpack::unpack((const char*)buf+1, count-1);
       msgpack::object deserialized = oh.get();
       std::vector< std::vector< std::tuple<std::string, int> > > glyphs;
@@ -51,15 +48,12 @@ int main(int argc, char *argv[]) {
       deserialized.convert(glyphs);
       nn_freemsg(buf);
 
+      // draw
       uint h = glyphs.size() * th;
       uint w = glyphs[0].size() * tw;
-
       if (w != Display::width() || h != Display::height()) {
-        std::cout << "setting size to " << w << "x" << h << std::flush;
         Display::set_size(w, h);
       }
-
-      // DRAW
       Display::set_colour(0xffffff);
       for (uint y = 0; y < glyphs.size(); ++y) {
         auto const& row = glyphs[y];
@@ -78,7 +72,6 @@ int main(int argc, char *argv[]) {
       Display::refresh();
     }
 
-    //printf("Get next\n");
     Events::poll();
     switch (Events::type()) {
     case Events::EVENT_RESIZE:
