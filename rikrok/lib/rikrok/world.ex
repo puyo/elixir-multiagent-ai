@@ -67,9 +67,6 @@ defmodule Rikrok.World do
   end
 
   def handle_call({:move_mob, mob, dx, dy}, _from, state) do
-    # IO.inspect move_mob: 1, mob: mob.tipped
-    # IO.inspect "World move mob"
-
     world_mob =
       state.matrix[mob.y][mob.x].mob
 
@@ -88,7 +85,6 @@ defmodule Rikrok.World do
         state
         |> put_in([:matrix], new_matrix)
 
-      # IO.inspect move_mob: 1, new_mob: new_mob.tipped
       {:reply, new_mob, new_state}
     else
       {:reply, mob, state}
@@ -96,8 +92,6 @@ defmodule Rikrok.World do
   end
 
   def handle_call({:tag, mob, target}, _from, state) do
-    # IO.inspect tag: 1, mob: mob, target: target
-
     dx = target.x - mob.x
     dy = target.y - mob.y
 
@@ -112,7 +106,6 @@ defmodule Rikrok.World do
         state
         |> put_in([:matrix], new_matrix)
 
-      # IO.inspect tag: 1, new_target: new_target.tipped
       {:reply, 1, new_state}
     else
       {:reply, 0, state}
@@ -125,14 +118,6 @@ defmodule Rikrok.World do
     x = mob.x - div(w, 2)
     y = mob.y - div(h, 2)
     area = Rikrok.Matrix.sub_matrix(state.matrix, x, y, w, h)
-
-    # check for this bug
-    zeros = Rikrok.Matrix.flat_map(area, fn x -> x end)
-    |> Enum.filter(fn x -> x == 0 end)
-    if Enum.any?(zeros) do
-      IO.inspect x: x, y: y, w: w, h: h, zeros: zeros, area: area
-      raise "XXXX"
-    end
 
     {:reply, {:ok, area}, state}
   end
@@ -190,19 +175,19 @@ defmodule Rikrok.World do
     |> set_mob_pos(x, y)
   end
 
-  def set_mob_pos(%{mob: nil} = t, _, _), do: t
+  defp set_mob_pos(%{mob: nil} = t, _, _), do: t
 
-  def set_mob_pos(%{mob: mob} = t, x, y) do
+  defp set_mob_pos(%{mob: mob} = t, x, y) do
     struct(t, mob: set_pos(mob, x, y))
   end
 
-  def set_pos(%{x: _, y: _} = obj, x, y) do
+  defp set_pos(%{x: _, y: _} = obj, x, y) do
     obj
     |> struct(x: x)
     |> struct(y: y)
   end
 
-  def matrix_to_glyph_map(matrix) do
+  defp matrix_to_glyph_map(matrix) do
     matrix
     |> Tensor.Matrix.to_list()
     |> Enum.map(fn row ->

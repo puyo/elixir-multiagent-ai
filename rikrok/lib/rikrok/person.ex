@@ -29,7 +29,6 @@ defmodule Rikrok.Person do
 
   @impl true
   def init([person]) do
-    #IO.puts "Person: init #{inspect person}"
     Process.send_after(self(), :update, 20)
     {:ok, person}
   end
@@ -47,7 +46,6 @@ defmodule Rikrok.Person do
   end
 
   def update(state) do
-    #IO.inspect "Updating #{state.name}"
     dx = Enum.random(-1..1)
     dy = Enum.random(-1..1)
     GenServer.call(Rikrok.World, {:move_mob, state, dx, dy})

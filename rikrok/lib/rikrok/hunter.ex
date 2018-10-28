@@ -29,7 +29,6 @@ defmodule Rikrok.Hunter do
 
   @impl true
   def init([person]) do
-    #IO.puts "Person: init #{inspect person}"
     Process.send_after(self(), :update, 20)
     {:ok, person}
   end
