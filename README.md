@@ -25,14 +25,27 @@ Runs the simulation. Sends the state to the viewer via inter-process comms.
 Renders the state. Obtains the state from the simulation via inter-process comms.
 
     cd viewer
+
+    # if OSX
     brew install msgpack nanomsg sdl libpng
+
+    # if Ubuntu
+    apt-get install libmsgpack-dev libnanomsg-dev libsdl1.2-dev libpng-dev
+
     make
     ./viewer
 
 ## TODO
 
+* Refactor all the awful code. It's weekend hacking quality.
+
+* Make agents smarter. A* pathfinding, for example.
+
+* Add line-of-sight checks.
+
 * Swap client/server. The simulation should probably be the server and the
   viewer should be the client. They're around the wrong way currently, but it
-  doesn't matter too much because I am running one of each in a 2-way pair.
-
-* Make agents smarter.
+  doesn't matter too much because I am running one of each in a 2-way pair and
+  they both try to reconnect. Only relevant if you wanted an MVC like situation
+  with 1 simulation and multiple views of it. Then you'd probably need sub, not
+  pair mode.
